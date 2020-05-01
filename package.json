@@ -1,0 +1,57 @@
+{
+  "name": "m3tior-atom-supplementary-file-resolver",
+  "main": "./lib/supplement-resolver.js",
+  "version": "0.0.0",
+  "description": "Adds a quick access supplementary file resolver.",
+  "files": [
+    "lib/**/*",
+    "menus/**/*",
+    "styles/**/*",
+    "keymaps/**/*",
+    "CHANGELOG.md",
+    "LICENSE.md",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "rollup -c .rollup.config.js",
+    "prepare": "npm run-script build",
+    "dev": "rollup -cw",
+    "lint": "eslint ./src"
+  },
+  "keywords": [
+    "supplement",
+    "C++",
+    "C",
+    "HTML",
+    "PHP",
+    "Javascript",
+    "CSS",
+    "fullstack",
+    "helper"
+  ],
+  "activationCommands": {
+    "atom-workspace": [
+      "m3tior-supplement-resolver:choose",
+      "m3tior-supplement-resolver:openAll"
+    ]
+  },
+  "repository": "https://github.com/atom/m3tior-atom-supplementary-file-resolver",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "dependencies": {
+    "eval": "^0.1.4"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "link:../plugins/packages/node-resolve",
+    "eslint": "^6.8.0",
+    "eslint-plugin-jest": "^23.8.2",
+    "eslint-plugin-jsdoc": "^24.0.0",
+    "eslint-plugin-svelte3": "^2.7.3",
+    "rollup": "^2.7.6",
+    "rollup-plugin-svelte": "^5.2.1",
+    "rollup-plugin-uglify": "^6.0.4",
+    "svelte": "^3.21.0"
+  }
+}

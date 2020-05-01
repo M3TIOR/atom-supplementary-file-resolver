@@ -1,0 +1,41 @@
+{
+	"env": {
+		"browser": true,
+		"es6": true,
+		"node": true
+	},
+	"plugins": [ "jsdoc", "jest", "svelte3" ],
+	"extends": [
+		"eslint:recommended",
+		"plugin:jsdoc/recommended"
+	],
+	"globals": {
+		"Atomics": "readonly",
+		"SharedArrayBuffer": "readonly"
+	},
+	"parserOptions": {
+		"ecmaVersion": 2018,
+		"sourceType": "module"
+	},
+	"rules": {
+		"no-fallthrough": "off",
+		"no-console": "off",
+		"no-unused-vars": "warn",
+		"max-len": [ "error",
+			{
+				"code": 120,
+				"tabWidth": 2
+			}
+		],
+		"indent": [ "error", "tab" ],
+		"linebreak-style": [ "error", "unix" ],
+		"semi": [ "error", "always" ],
+		"jest/no-disabled-tests": "warn"
+	},
+	"overrides": [
+		{
+			"files": ["**/*.svelte"],
+			"processor": "svelte3/svelte3"
+		}
+	]
+}
