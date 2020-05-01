@@ -1,0 +1,26 @@
+{
+  "context-menu": {
+    "atom-text-editor": [
+      {
+        "label": "Toggle m3tior-atom-cpp-header-resolver",
+        "command": "m3tior-atom-cpp-header-resolver:toggle"
+      }
+    ]
+  },
+  "menu": [
+    {
+      "label": "Packages",
+      "submenu": [
+        {
+          "label": "m3tior-atom-cpp-header-resolver",
+          "submenu": [
+            {
+              "label": "Toggle",
+              "command": "m3tior-atom-cpp-header-resolver:toggle"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
