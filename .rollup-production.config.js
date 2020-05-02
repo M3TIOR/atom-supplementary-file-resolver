@@ -59,7 +59,7 @@ export default {
       // hydratable: true,
     }),
 		// Only when building for production do we use the minifier.
-		(process.env.NODE_ENV === 'production' && terser({
+		terser({
 			mangle: {
 				toplevel: true,
 				module: true,
@@ -68,6 +68,6 @@ export default {
 					"subscriptions", "activate", "deactivate", "serialize",
 				],
 			},
-		})),
+		}),
   ]
 }
