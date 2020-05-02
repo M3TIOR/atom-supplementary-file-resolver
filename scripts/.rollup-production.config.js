@@ -20,44 +20,17 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // External Imports
-import { nodeResolve as resolve } from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
-import svelte from 'rollup-plugin-svelte';
 
 // Internal Imports
-//...
+import coreConfig from './.rollup-main.config';
 
 // Standard Imports
 //...
 
 
-export default {
-  input: 'src/supplement-resolver.js',
-  output: {
-    file: 'lib/supplement-resolver.js',
-    format: 'es',
-		intro: "\"use babel\";",
-  },
-	external: [ "eval", "fs", "path", "atom" ],
+export default Object.assign(coreConfig, {
   plugins: [
-		resolve({
-			// Needed to ensure .svelte deps get resolved properly.
-			extensions: ['.mjs', '.js', '.json', '.node', '.svelte'],
-			resolveOnly: [ /^svelte.*/ ],
-		}),
-    svelte({
-      // You can restrict which files are compiled
-      // using `include` and `exclude`
-      include: 'src/ui/**/*.svelte',
-
-      // By default, the client-side compiler is used. You
-      // can also use the server-side rendering compiler
-      // generate: 'ssr',
-
-      // ensure that extra attributes are added to head
-      // elements for hydration (used with ssr: true)
-      // hydratable: true,
-    }),
 		// Only when building for production do we use the minifier.
 		terser({
 			mangle: {
@@ -70,4 +43,4 @@ export default {
 			},
 		}),
   ]
-}
+});
