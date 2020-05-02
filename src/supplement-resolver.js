@@ -36,7 +36,7 @@ import fs from 'fs';
 //function isDecendant(path, )
 
 async function openSingle(file) {
-
+	atom.workspace.open(file);
 }
 
 function resolverPathPair(p) {
@@ -83,73 +83,6 @@ function backpropagateResolvers(entries) {
 
 	return entries;
 }
-
-// class MockTreeFS() {
-// 	constructor(paths){
-// 		// Can have more than one tree when more than one root exists.
-// 		this.trees = {};
-// 	}
-//
-// 	add(p) {
-// 		let currentNode = null;
-// 		const parsed = path.parse(p);
-//
-// 		if ( ! this.trees[parsed.root] )
-// 			this.trees[parsed.root] = {};
-//
-// 		currentNode = this.trees[parsed.root];
-// 		for (let dir in parsed.dir.split(path.sep)){
-// 			if (! currentNode[dir]){
-// 				currentNode[dir] = {};
-// 				currentNode = currentNode[dir];
-// 			}
-// 		}
-//
-// 		if (! currentNode[parsed.base]) {
-// 			currentNode[parsed.base] = {};
-// 		}
-// 	}
-//
-// 	rm(p) {
-// 		let currentNode = null;
-// 		const parsed = path.parse(p);
-//
-// 		if (! currentNode = this.trees[parsed.root])
-// 			return null;
-//
-// 		for (let dir in parsed.dir.split(path.sep)){
-// 			if (! currentNode = currentNode[dir])
-// 				return null;
-// 		}
-//
-// 		if (! currentNode = currentNode[parsed.base])
-// 			return null;
-// 		else
-// 			return currentNode;
-// 	}
-//
-// 	open(p) {
-// 		let currentNode = null;
-// 		const parsed = path.parse(p);
-//
-// 		if (! currentNode = this.trees[parsed.root])
-// 			return null;
-//
-// 		for (let dir in parsed.dir.split(path.sep)){
-// 			if (! currentNode = currentNode[dir])
-// 				return null;
-// 		}
-//
-// 		if (! currentNode = currentNode[parsed.base])
-// 			return null;
-// 		else
-// 			return currentNode;
-// 	}
-//
-// 	map() {
-//
-// 	}
-// }
 
 export default {
 	subscriptions: null,
