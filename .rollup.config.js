@@ -21,8 +21,8 @@
 
 // External Imports
 import { nodeResolve as resolve } from '@rollup/plugin-node-resolve';
+import { terser } from 'rollup-plugin-terser';
 import svelte from 'rollup-plugin-svelte';
-import { uglify } from 'rollup-plugin-uglify';
 
 // Internal Imports
 //...
@@ -56,10 +56,16 @@ export default {
       // elements for hydration (used with ssr: true)
       // hydratable: true,
     }),
-		// uglify({
-		// 	mangle: {
-		//		
-		// 	}
-		// }),
+		// Only when building for production do we use the minifier.
+		(process.env.NODE_ENV === 'production' && terser({
+			mangle: {
+				toplevel: true,
+				module: true,
+				reserved: [
+					// These must be reserved, they're a part of Atom's API hooks
+					"subscriptions", "activate", "deactivate", "serialize",
+				],
+			},
+		})),
   ]
 }
