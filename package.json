@@ -13,9 +13,8 @@
 		"README.md"
 	],
 	"scripts": {
-		"build": "rollup -c .rollup.config.js",
-		"prepare": "npm run-script build",
-		"dev": "rollup -cw",
+		"build": "rollup -c scripts/.rollup-development.config.js",
+		"prepublishOnly": "rollup -c scripts/.rollup-production.config.js",
 		"lint": "eslint ./src"
 	},
 	"keywords": [
