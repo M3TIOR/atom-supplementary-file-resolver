@@ -37,6 +37,7 @@ export default {
     file: 'lib/supplement-resolver.js',
     format: 'es'
   },
+	external: [ "eval", "fs", "path", "atom" ],
   plugins: [
 		resolve({
 			// Needed to ensure .svelte deps get resolved properly.
