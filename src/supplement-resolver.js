@@ -1,4 +1,3 @@
-'use babel';
 // Copyright (c) 2020 Ruby Allison Rose (aka. M3TIOR)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
