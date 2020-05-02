@@ -47,7 +47,7 @@ export default class SveltePlug {
 		this.element = document.createElement('div');
 
 		componentOptions = Object.assign(componentOptions || {}, {target: this.element});
-		this.svelte = new ComponentConstructor(...componentOptions);
+		this.svelte = new ComponentConstructor(componentOptions);
 	}
 
 	// Tear down any state and detach
