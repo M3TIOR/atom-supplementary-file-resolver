@@ -35,7 +35,8 @@ export default {
   input: 'src/supplement-resolver.js',
   output: {
     file: 'lib/supplement-resolver.js',
-    format: 'es'
+    format: 'es',
+		intro: "\"use babel\";",
   },
 	external: [ "eval", "fs", "path", "atom" ],
   plugins: [
