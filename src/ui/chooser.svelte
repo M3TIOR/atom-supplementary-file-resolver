@@ -39,6 +39,10 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			filenames.pop();
 
 			//filenames.sort();
+
+			// When there are no files left to select from, automatically close the
+			// selector window.
+			if (filenames.length === 1) closeDialog();
 		}
 		else {
 			closeDialog();
