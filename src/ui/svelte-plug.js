@@ -44,6 +44,7 @@ export default class SveltePlug {
 	constructor(ComponentConstructor, componentOptions) {
 		// Create root element (with hook for Javascript API)
 		this.element = document.createElement('div');
+		this.element.className = "svelte-container";
 
 		componentOptions = Object.assign(componentOptions || {}, {target: this.element});
 		this.svelte = new ComponentConstructor(componentOptions);
@@ -53,8 +54,6 @@ export default class SveltePlug {
 	destroy() { this.element.remove(); this.svelte.$destoy(); }
 	// Needed to interface with atom.workspace.addModalPanel().
 	getElement() { return this.element; }
-	// Accessor for svelte object just in case.
-	getSvelte() { return this.svelte; }
 	// Returns an object that can be retrieved when package is activated
 	serialize() {}
 }
