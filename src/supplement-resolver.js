@@ -33,9 +33,9 @@ import basicResolver from './basic-resolver';
 import path from 'path';
 import fs from 'fs';
 
-//function isDecendant(path, )
 
-async function openSingle(file) {
+
+function openSingle(file) {
 	atom.workspace.open(file);
 }
 
@@ -50,6 +50,7 @@ function resolverPathPair(p) {
 	catch (e) {
 		// TODO: warn users that we couldn't read their resolver because
 		//   of file permission issues. (This is extremely usefull.)
+		//atom.notifications.addWarning();
 	}
 
 	// Encoding coerces readFileSync's return value into a string for _eval.
@@ -64,21 +65,28 @@ function resolverPathPair(p) {
 }
 
 function backpropagateResolvers(entries) {
+	console.log("Backpropagating resolvers.");
 	// directory tree descent is easily solved using path lengths
-	entries.sort(([kA, vA], [kB, vB]) => kA.length < kB.length ? 1:-1);
+	if ( entries.length > 1 ){
+		// Sorting can only be done on arrays with more than one element.
+		// otherwise it throws an unprocessable entity error.
+		entries.sort(([kA, vA], [kB, vB]) => (kA.length < kB.length) ? 1:-1);
+	}
 
 	// back-propagate ancestor's resolvers to their children.
-	entries.map(([key, value], start, a) => {
+	entries = entries.map(([key, value], current, a) => {
 		// if value is not null, we skip backpropagation.
-		for (let i = start; (value === null) && (i < a.length); i++){
-			let [ancestorKey, ancestorValue] = a[i];
-			if (key.startsWith(ancestorKey) && ancestorValue !== null){
-				return [key, ancestorValue];
+		if (value == null){
+			for (let i = current+1; i < a.length; i++){
+				let [ancestorKey, ancestorValue] = a[i];
+				if (key.startsWith(ancestorKey) && ancestorValue != null){
+					return [key, ancestorValue];
+				}
 			}
-		}
 
-		// if we have no ancestors to inherit from, use the default
-		return [key, basicResolver];
+			// if we have no ancestors to inherit from, use the default
+			return [key, basicResolver];
+		}
 	});
 
 	return entries;
@@ -87,24 +95,48 @@ function backpropagateResolvers(entries) {
 export default {
 	subscriptions: null,
 	resolverMap: null,
+	modalComponent: null,
 	ui: null,
 
 	activate(state) {
+		console.info("Initializing M3TIOR's Supplement Resolver");
 		// Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
 		this.subscriptions = new CompositeDisposable();
 
+		console.info("Initializing a Svelte-Atom plugin for the Chooser UI element.");
+		this.modalComponent = new SveltePlug(Chooser, {
+			props: { onSelection: openSingle },
+		});
+
 		// Create root UI query element
 		// https://flight-manual.atom.io/api/v1.45.0/Workspace/#instance-addModalPanel
+		console.info("Initializing UI Modal Panel");
+		// NOTE: undocumented API change in Atom. This method now returns a Panel
+		//   instance which no longer has the accessor class .isVisible();
+		//   moving onward I'm assuming that's taken care of via a getter and
+		//   a setter.
+		//
+		// NOTE: The previous assertion is wrong. When passing in an item to the
+		//   addModalPanel() function, it must be a DOM object, otherwise the
+		//   output of it isn't a Panel. The behavior is "undefined". I really
+		//   wish the Atom devs would have been nice enough to add an error when
+		//   the input item type isn't supported. At the very least the
+		//   documentation could reflect the behavior! But currently it doesn't!
 		this.ui = atom.workspace.addModalPanel({ // eslint-disable-line
-			item: new SveltePlug(Chooser, {
-				props: { onSelection: openSingle },
-			}),
+			item: this.modalComponent.getElement(),
 			visible: false,
+			autoFocus: false,
 		});
 
 		// Wire up the dialog close method in our Svelte UI
-		this.ui.getElement().getSvelte().$set({closeDialog: this.ui.hide});
+		this.modalComponent.svelte.$set({closeDialog: () => this.ui.hide()});
 
+		console.info("Initializing startup Resolver list.");
+		const initialResolverPairs = atom.project.getPaths().map(resolverPathPair); // eslint-disable-line
+		// Map ordering is done within backpropagation.
+		this.resolverMap = new Map(backpropagateResolvers(initialResolverPairs));
+
+		console.info("Registering event Subscriptions.");
 		this.subscriptions.add(atom.project.onDidChangePaths((roots) => { // eslint-disable-line
 			// Arrays have faster operations, more helpful API.
 			let entries = [...this.resolverMap.entries()];
@@ -123,23 +155,29 @@ export default {
 			this.resolverMap = new Map(backpropagateResolvers(entries));
 		}));
 
-		const initialResolverPairs = atom.project.getPaths().map(resolverPathPair); // eslint-disable-line
-		// Map ordering is done within backpropagation.
-		this.resolverMap = new Map(backpropagateResolvers(initialResolverPairs));
-
 		// Register command that toggles this view
 		this.subscriptions.add(atom.commands.add('atom-workspace', { //eslint-disable-line
+			// NOTE: Something about how V8 interprets lambda functions makes
+			//   the following suitable for calling "this" on the parent object.
+			//   Using "this.chooser" without the lambda wrapper breaks
+			//   the "this" accessor in the "this.chooser" function when it's called.
 			'm3tior-supplement-resolver:choose': () => this.chooser(),
 			'm3tior-supplement-resolver:openAll': () => this.openAll(),
 		}));
+
+		console.info("Initialization of M3TIOR's Supplement Resolver Completed!");
+		console.log(this);
 	},
 
 	deactivate() {
+		console.info("Deactivating M3TIOR's Supplement Resolver.");
 		this.subscriptions.dispose();
+		this.modalComponent.destroy();
 		this.ui.remove();
 	},
 
 	serialize() {
+		console.info("Atom is trying to serialize our running state.");
 		return {}; // Nothing to be serialized here.
 	},
 
@@ -148,6 +186,7 @@ export default {
 	},
 
 	runResolver() {
+		console.info("Attempting to find and run file resolver.");
 		const editor = atom.workspace.getActiveTextEditor(); // eslint-disable-line
 		const grammar = editor.getGrammar();
 		const target = editor.getPath();
@@ -156,20 +195,30 @@ export default {
 		for (let resolverLocation of this.resolverMap.keys())
 			if (target.startsWith(key = resolverLocation)) break;
 
+		// NOTE: Don't try and inline this like I did. It obfuscates errors...
+		const resolve = this.resolverMap.get(key);
 		/**
 		 * XXX: This is a hack. Grammar.fileTypes is not a part of the
 		 *   Atom public API and is subject to change at any time. So
 		 *   this may require a lot of maintenance. I wanted to offer it
 		 *   as a feature just so there's less for the resolver writers to do.
 		 */
-		return this.resolverMap.get(key)(target, grammar.fileTypes);
+		return resolve(target, grammar.fileTypes);
 	},
 
 
 	chooser() {
-		if (this.ui.isVisible() === true) {
-			this.ui.getElement().getSvelte().$set({
-				filenames: this.runResolver(),
+		console.info("Attempting to open the file chooser.");
+		if (this.ui.isVisible() === false) {
+			const results = this.runResolver();
+
+			if (results.length < 1){
+				atom.notifications.addInfo("Could not find supplements to this file.", {})
+				return;
+			}
+
+			this.modalComponent.svelte.$set({
+				filenames: results,
 			});
 
 			this.ui.show();
