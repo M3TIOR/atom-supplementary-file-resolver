@@ -3,7 +3,7 @@
     "atom-text-editor": [
       {
         "label": "Choose a supplementary file to open.",
-        "command": "m3tior-atom-supplement-resolver:choose"
+        "command": "m3tior-supplement-resolver:choose"
       }
     ]
   },
@@ -12,11 +12,11 @@
       "label": "Packages",
       "submenu": [
         {
-          "label": "m3tior-atom-supplement-resolver",
+          "label": "m3tior-supplement-resolver",
           "submenu": [
             {
               "label": "Open Chooser",
-              "command": "m3tior-atom-supplement-resolver:choose"
+              "command": "m3tior-supplement-resolver:choose"
             }
           ]
         }

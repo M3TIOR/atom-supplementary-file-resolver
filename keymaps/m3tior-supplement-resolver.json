@@ -1,0 +1,6 @@
+{
+  "atom-workspace": {
+    "ctrl-alt-r": "m3tior-supplement-resolver:choose",
+		"ctrl-alt-e": "m3tior-supplement-resolver:openAll"
+  }
+}

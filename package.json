@@ -1,10 +1,10 @@
 {
-	"name": "m3tior-atom-supplementary-file-resolver",
-	"main": "./lib/supplement-resolver.min.js",
+	"name": "m3tior-supplement-resolver",
+	"main": "./lib/supplement-resolver.js",
 	"version": "0.0.0",
 	"description": "Adds a quick access supplementary file resolver.",
 	"files": [
-		"lib/m3tior-supplement-resolver.min.js",
+		"lib/supplement-resolver.js",
 		"menus/**/*",
 		"styles/**/*",
 		"keymaps/**/*",
