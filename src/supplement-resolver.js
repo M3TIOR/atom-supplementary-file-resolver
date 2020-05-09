@@ -26,7 +26,7 @@ import _eval from 'eval';
 
 // Internal Imports
 import Chooser from './ui/chooser.svelte';
-import SveltePlug from './ui/svelte-plug';
+import SvelteCharm from './ui/svelte-plug';
 import basicResolver from './basic-resolver';
 
 // Standard Imports
@@ -99,7 +99,6 @@ function backpropagateResolvers(entries) {
 export default {
 	subscriptions: null,
 	resolverMap: null,
-	modalComponent: null,
 	ui: null,
 
 	activate(state) {
@@ -107,28 +106,16 @@ export default {
 		// Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
 		this.subscriptions = new CompositeDisposable();
 
-		console.info("Initializing a Svelte-Atom plugin for the Chooser UI element.");
-		this.modalComponent = new SveltePlug(Chooser, {
-			props: { onSelection: atom.workspace.open },
-		});
-
-		// Create root UI query element
-		// https://flight-manual.atom.io/api/v1.45.0/Workspace/#instance-addModalPanel
-		console.info("Initializing UI Modal Panel");
-		// NOTE: When passing in an item to the
-		//   addModalPanel() function, it must be a DOM object, otherwise the
-		//   output of it isn't a Panel. The behavior is "undefined". I really
-		//   wish the Atom devs would have been nice enough to add an error when
-		//   the input item type isn't supported. At the very least the
-		//   documentation could reflect the behavior! But currently it doesn't!
-		this.ui = atom.workspace.addModalPanel({
-			item: this.modalComponent.getElement(),
+		console.info("Initializing a Svelte-Charm plugin for the Chooser UI element.");
+		this.ui = new SvelteCharm(Chooser, atom.workspace.addModalPanel, {
+			props: (self) => {
+				return {
+					onSelection: atom.workspace.open,
+					closeDialog: self.hide,
+				};
+			},
 			visible: false,
-			autoFocus: false,
 		});
-
-		// Wire up the dialog close method in our Svelte UI
-		this.modalComponent.svelte.$set({closeDialog: () => this.ui.hide()});
 
 		console.info("Initializing startup Resolver list.");
 		const initialResolverPairs = atom.project.getPaths().map(resolverPathPair);
@@ -171,8 +158,7 @@ export default {
 	deactivate() {
 		console.info("Deactivating M3TIOR's Supplement Resolver.");
 		this.subscriptions.dispose();
-		this.modalComponent.destroy();
-		this.ui.remove();
+		this.ui.destroy();
 	},
 
 	serialize() {
@@ -218,7 +204,7 @@ export default {
 				return;
 			}
 
-			this.modalComponent.svelte.$set({
+			this.ui.$set({
 				filenames: results,
 			});
 
