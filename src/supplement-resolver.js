@@ -45,7 +45,7 @@ function resolverPathPair(p) {
 	catch (e) {
 		// TODO: warn users that we couldn't read their resolver because
 		//   of file permission issues. (This is extremely usefull.)
-		atom.notifications.addWarning( // eslint-disable-line
+		atom.notifications.addWarning(
 			`Couldn't read resolver **${target}**, using the basic resolver instead.`
 		);
 	}
@@ -55,7 +55,7 @@ function resolverPathPair(p) {
 	const resolver = _eval(contents, target, {__dirname: p});
 	if (typeof resolver !== "function") {
 		// TODO: let users know their resolver's export was malformed.
-		atom.notifications.addError( // eslint-disable-line
+		atom.notifications.addError(
 			`Resolver export in "${target}" is malformed.`,{
 				description: `Expected resolver to export a **function** but \
 instead recieved type **${typeof(target)}**.`,
@@ -109,7 +109,7 @@ export default {
 
 		console.info("Initializing a Svelte-Atom plugin for the Chooser UI element.");
 		this.modalComponent = new SveltePlug(Chooser, {
-			props: { onSelection: atom.workspace.open }, // eslint-disable-line
+			props: { onSelection: atom.workspace.open },
 		});
 
 		// Create root UI query element
@@ -121,7 +121,7 @@ export default {
 		//   wish the Atom devs would have been nice enough to add an error when
 		//   the input item type isn't supported. At the very least the
 		//   documentation could reflect the behavior! But currently it doesn't!
-		this.ui = atom.workspace.addModalPanel({ // eslint-disable-line
+		this.ui = atom.workspace.addModalPanel({
 			item: this.modalComponent.getElement(),
 			visible: false,
 			autoFocus: false,
@@ -131,12 +131,12 @@ export default {
 		this.modalComponent.svelte.$set({closeDialog: () => this.ui.hide()});
 
 		console.info("Initializing startup Resolver list.");
-		const initialResolverPairs = atom.project.getPaths().map(resolverPathPair); // eslint-disable-line
+		const initialResolverPairs = atom.project.getPaths().map(resolverPathPair);
 		// Map ordering is done within backpropagation.
 		this.resolverMap = new Map(backpropagateResolvers(initialResolverPairs));
 
 		console.info("Registering event Subscriptions.");
-		this.subscriptions.add(atom.project.onDidChangePaths((roots) => { // eslint-disable-line
+		this.subscriptions.add(atom.project.onDidChangePaths((roots) => {
 			// Arrays have faster operations, more helpful API.
 			let entries = [...this.resolverMap.entries()];
 			// Filter out paths that may have been removed.
@@ -155,7 +155,7 @@ export default {
 		}));
 
 		// Register command that toggles this view
-		this.subscriptions.add(atom.commands.add('atom-workspace', { //eslint-disable-line
+		this.subscriptions.add(atom.commands.add('atom-workspace', {
 			// NOTE: Something about how V8 interprets lambda functions makes
 			//   the following suitable for calling "this" on the parent object.
 			//   Using "this.chooser" without the lambda wrapper breaks
@@ -182,13 +182,13 @@ export default {
 
 	openAll() {
 		this.runResolver().forEach((filename) => {
-			atom.workspace.open(filename); // eslint-disable-line
+			atom.workspace.open(filename);
 		});
 	},
 
 	runResolver() {
 		console.info("Attempting to find and run file resolver.");
-		const editor = atom.workspace.getActiveTextEditor(); // eslint-disable-line
+		const editor = atom.workspace.getActiveTextEditor();
 		const grammar = editor.getGrammar();
 		const target = editor.getPath();
 
@@ -214,7 +214,7 @@ export default {
 			const results = this.runResolver();
 
 			if (results.length < 1){
-				atom.notifications.addInfo("Could not find supplements to this file."); // eslint-disable-line
+				atom.notifications.addInfo("Could not find supplements to this file.");
 				return;
 			}
 
