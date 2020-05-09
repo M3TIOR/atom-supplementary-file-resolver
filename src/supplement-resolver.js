@@ -34,11 +34,6 @@ import path from 'path';
 import fs from 'fs';
 
 
-
-function openSingle(file) {
-	atom.workspace.open(file);
-}
-
 function resolverPathPair(p) {
 	const target = path.join(p, ".supplements.js");
 	// First access check's whether or not we have a resolver to parse.
@@ -50,7 +45,9 @@ function resolverPathPair(p) {
 	catch (e) {
 		// TODO: warn users that we couldn't read their resolver because
 		//   of file permission issues. (This is extremely usefull.)
-		//atom.notifications.addWarning();
+		atom.notifications.addWarning( // eslint-disable-line
+			`Couldn't read resolver **${target}**, using the basic resolver instead.`
+		);
 	}
 
 	// Encoding coerces readFileSync's return value into a string for _eval.
@@ -58,6 +55,13 @@ function resolverPathPair(p) {
 	const resolver = _eval(contents, target, {__dirname: p});
 	if (typeof resolver !== "function") {
 		// TODO: let users know their resolver's export was malformed.
+		atom.notifications.addError( // eslint-disable-line
+			`Resolver export in "${target}" is malformed.`,{
+				description: `Expected resolver to export a **function** but \
+instead recieved type **${typeof(target)}**.`,
+			}
+		);
+
 		return [p, null];
 	}
 
@@ -105,18 +109,13 @@ export default {
 
 		console.info("Initializing a Svelte-Atom plugin for the Chooser UI element.");
 		this.modalComponent = new SveltePlug(Chooser, {
-			props: { onSelection: openSingle },
+			props: { onSelection: atom.workspace.open }, // eslint-disable-line
 		});
 
 		// Create root UI query element
 		// https://flight-manual.atom.io/api/v1.45.0/Workspace/#instance-addModalPanel
 		console.info("Initializing UI Modal Panel");
-		// NOTE: undocumented API change in Atom. This method now returns a Panel
-		//   instance which no longer has the accessor class .isVisible();
-		//   moving onward I'm assuming that's taken care of via a getter and
-		//   a setter.
-		//
-		// NOTE: The previous assertion is wrong. When passing in an item to the
+		// NOTE: When passing in an item to the
 		//   addModalPanel() function, it must be a DOM object, otherwise the
 		//   output of it isn't a Panel. The behavior is "undefined". I really
 		//   wish the Atom devs would have been nice enough to add an error when
@@ -182,7 +181,9 @@ export default {
 	},
 
 	openAll() {
-		this.runResolver().forEach((filename) => openSingle(filename));
+		this.runResolver().forEach((filename) => {
+			atom.workspace.open(filename); // eslint-disable-line
+		});
 	},
 
 	runResolver() {
@@ -213,7 +214,7 @@ export default {
 			const results = this.runResolver();
 
 			if (results.length < 1){
-				atom.notifications.addInfo("Could not find supplements to this file.", {})
+				atom.notifications.addInfo("Could not find supplements to this file."); // eslint-disable-line
 				return;
 			}
 
